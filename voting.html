@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> College Club Election</title>
+
+<style>
+
+body{
+font-family: Arial;
+background: linear-gradient(120deg,#1e3c72,#2a5298);
+color:white;
+margin:0;
+text-align:center;
+}
+
+header{
+background:rgba(0,0,0,0.4);
+padding:20px;
+}
+
+.container{
+padding:30px;
+}
+
+input{
+padding:10px;
+font-size:16px;
+border-radius:5px;
+border:none;
+}
+
+.candidates{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+margin-top:30px;
+}
+
+.card{
+background:white;
+color:black;
+width:220px;
+margin:15px;
+padding:20px;
+border-radius:12px;
+box-shadow:0 6px 15px rgba(0,0,0,0.3);
+transition:0.3s;
+}
+
+.card:hover{
+transform:scale(1.08);
+}
+
+button{
+padding:10px 20px;
+border:none;
+background:#ff9800;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#e68900;
+}
+
+.results{
+width:60%;
+margin:auto;
+margin-top:30px;
+}
+
+.bar{
+background:white;
+border-radius:20px;
+margin:10px 0;
+overflow:hidden;
+height:25px;
+}
+
+.fill{
+background:#4caf50;
+height:100%;
+text-align:right;
+padding-right:10px;
+color:white;
+}
+
+table{
+margin:auto;
+margin-top:30px;
+border-collapse:collapse;
+width:70%;
+background:white;
+color:black;
+}
+
+th,td{
+padding:10px;
+border:1px solid black;
+}
+
+th{
+background:#333;
+color:white;
+}
+
+.admin{
+margin-top:40px;
+padding:20px;
+background:rgba(0,0,0,0.3);
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🎓 Ganadipathy Tulsi's Jain Engineering College</h1>
+<h2>College Club Election – Online Voting System</h2>
+</header>
+
+<div class="container">
+
+<h2>Enter Student Name</h2>
+<input id="studentName" placeholder="Student Name">
+
+<p id="msg"></p>
+
+<div class="candidates">
+
+<div class="card">
+<h3>Santhosh</h3>
+<p>President Candidate</p>
+<button onclick="vote('Santhosh')">Vote</button>
+</div>
+
+<div class="card">
+<h3>Adaikkalam</h3>
+<p>Vice President Candidate</p>
+<button onclick="vote('Adaikkalam')">Vote</button>
+</div>
+
+<div class="card">
+<h3>Rubavelan</h3>
+<p>Secretary Candidate</p>
+<button onclick="vote('Rubavelan')">Vote</button>
+</div>
+
+</div>
+
+</div>
+
+<div class="admin">
+
+<h2>📊 Election Results (Admin Panel)</h2>
+<button onclick="showResults()">Show Result Chart</button>
+
+<div class="results" id="results"></div>
+
+<h2>🗂 Voting Database</h2>
+<button onclick="showDatabase()">Show Voting List</button>
+
+<table id="dbTable">
+<tr>
+<th>Student Name</th>
+<th>Candidate</th>
+</tr>
+</table>
+
+</div>
+
+<script>
+
+let voteData = JSON.parse(localStorage.getItem("voteDB")) || [];
+
+function vote(candidate){
+
+let name = document.getElementById("studentName").value.trim();
+
+let namePattern = /^[A-Za-z ]+$/;
+
+if(name==""){
+document.getElementById("msg").innerText="⚠ Please enter your name";
+return;
+}
+
+if(!namePattern.test(name)){
+document.getElementById("msg").innerText="❌ Numbers are not allowed. Enter valid name.";
+return;
+}
+
+let already = voteData.find(v=>v.studentName === name);
+
+if(already){
+document.getElementById("msg").innerText="❌ This student already voted!";
+return;
+}
+
+voteData.push({
+studentName:name,
+candidate:candidate
+});
+
+localStorage.setItem("voteDB",JSON.stringify(voteData));
+
+document.getElementById("msg").innerText="✅ Vote submitted successfully!";
+
+}
+
+function showResults(){
+
+let count={Santhosh:0,Adaikkalam:0,Rubavelan:0};
+
+voteData.forEach(v=>{
+count[v.candidate]++;
+});
+
+let total=voteData.length;
+
+if(total==0){
+document.getElementById("results").innerHTML="No votes yet";
+return;
+}
+
+let s=((count.Santhosh/total)*100).toFixed(1);
+let a=((count.Adaikkalam/total)*100).toFixed(1);
+let r=((count.Rubavelan/total)*100).toFixed(1);
+
+document.getElementById("results").innerHTML=
+
+"<p>Santhosh ("+count.Santhosh+" votes)</p>"+
+"<div class='bar'><div class='fill' style='width:"+s+"%'>"+s+"%</div></div>"+
+
+"<p>Adaikkalam ("+count.Adaikkalam+" votes)</p>"+
+"<div class='bar'><div class='fill' style='width:"+a+"%'>"+a+"%</div></div>"+
+
+"<p>Rubavelan ("+count.Rubavelan+" votes)</p>"+
+"<div class='bar'><div class='fill' style='width:"+r+"%'>"+r+"%</div></div>";
+
+}
+
+function showDatabase(){
+
+let table=document.getElementById("dbTable");
+
+table.innerHTML="<tr><th>Student Name</th><th>Candidate</th></tr>";
+
+voteData.forEach(v=>{
+
+table.innerHTML+=
+"<tr>"+
+"<td>"+v.studentName+"</td>"+
+"<td>"+v.candidate+"</td>"+
+"</tr>";
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
